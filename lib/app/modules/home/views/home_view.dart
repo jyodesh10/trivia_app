@@ -2,56 +2,80 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
+import 'package:trivia_app/app/modules/home/controllers/home_controller.dart';
 import 'package:trivia_app/app/modules/home/controllers/quiz_controller.dart';
 import 'package:trivia_app/app/routes/app_pages.dart';
 import 'package:trivia_app/constants/colors.dart';
 import 'package:trivia_app/theme.dart';
+import 'package:trivia_app/widgets/my_button.dart';
 import 'package:trivia_app/widgets/progress_timer.dart';
+import 'package:trivia_app/widgets/question_tile.dart';
 
-import '../controllers/home_controller.dart';
-
-class HomeView extends GetView<QuizController> {
+class HomeView extends GetView<HomeController> {
   @override
-  final QuizController controller = Get.put(QuizController());
+  final HomeController controller = Get.put(HomeController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: AppColor.primaryClr,
         body: SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        width: double.infinity,
-        height: 800,
-        decoration: BoxDecoration(color: AppColor.primaryClr),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            SizedBox(
-              height: 40.h,
+          child: GetBuilder<HomeController>(
+            init: Get.find<HomeController>(),
+            builder: (controller) => Container(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              width: double.infinity,
+              // height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(color: AppColor.primaryClr),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  SizedBox(
+                    height: 40.h,
+                  ),
+                  buildCountdown(context),
+                  SizedBox(
+                    height: 40.h,
+                  ),
+                  buildRoundTile(),
+                  SizedBox(
+                    height: 40.h,
+                  ),
+                  // buildQuestionText(),
+                  // SizedBox(
+                  //   height: 40.h,
+                  // ),
+                  SizedBox(
+                    height: 400,
+                    child: PageView.builder(
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) => QuestionTile(
+                        questionModel: controller.questionsList[index],
+                      ),
+                      controller: controller.pageController,
+                      itemCount: controller.questionsList.length,
+                    ),
+                  ),
+                  // ...List.generate(
+                  //     controller.questionsList.length,
+                  //     (index) => QuestionCard(
+                  //         questionModel: controller.questionsList[index])),
+                  // // buildOptionsTile('A'),
+                  // // buildOptionsTile('B'),
+                  // // buildOptionsTile('C'),
+                  // // buildOptionsTile('D'),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  // buildSkipButton(),
+                  MyButton(
+                      onPressed: () => controller.nextQuestion(),
+                      text: 'Next Question'),
+                ],
+              ),
             ),
-            buildCountdown(),
-            SizedBox(
-              height: 40.h,
-            ),
-            buildRoundTile(),
-            SizedBox(
-              height: 40.h,
-            ),
-            buildQuestionText(),
-            SizedBox(
-              height: 40.h,
-            ),
-            Obx(() => buildOptionsTile('A')),
-            buildOptionsTile('B'),
-            buildOptionsTile('C'),
-            buildOptionsTile('D'),
-            SizedBox(
-              height: 10.h,
-            ),
-            buildSkipButton(),
-          ],
-        ),
-      ),
-    ));
+          ),
+        ));
   }
 
   buildOptionsTile(sn) {
@@ -87,7 +111,7 @@ class HomeView extends GetView<QuizController> {
             ),
             Center(
               child: Text(
-                'Mount Everest',
+                'as Everest',
                 style: subtitleStyle,
               ),
             )
@@ -97,27 +121,63 @@ class HomeView extends GetView<QuizController> {
     );
   }
 
-  buildCountdown() {
+  buildCountdown(context) {
     return Stack(
       children: [
         Positioned(
             top: 10.h,
             child: InkWell(
                 onTap: () {
-                  Get.toNamed(Routes.CATEGORY_PAGE);
+                  showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: Text(
+                        'Are you sure to exit ?',
+                        style: titleStyle.copyWith(
+                            fontSize: 20, color: AppColor.borderClr),
+                      ),
+                      elevation: 5,
+                      backgroundColor: AppColor.primaryClr2,
+                      content: Text(
+                        'All progress will be lost',
+                        style: titleStyle.copyWith(
+                            fontSize: 15, color: AppColor.borderClr),
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, 'Cancel'),
+                          child: Text(
+                            'Cancel',
+                            style: titleStyle.copyWith(
+                                fontSize: 20, color: Colors.white),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            controller.startAgain();
+                            Get.toNamed(Routes.LOGIN);
+                          },
+                          child: Text(
+                            'Yes',
+                            style: titleStyle.copyWith(
+                                fontSize: 20, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ); // Get.toNamed(Routes.LOGIN);
                 },
                 child: Icon(Icons.home_filled, color: Colors.white))),
         Center(
           child: CircleAvatar(
             backgroundColor: AppColor.borderClr,
-            radius: 33,
-            child:
-                // ProgressTimer(),
-                CircleAvatar(
-              backgroundColor: AppColor.primaryClr2,
-              radius: 30,
-              child: Text('10', style: headingStyle),
-            ),
+            radius: 20,
+            child: ProgressTimer(),
+            //     CircleAvatar(
+            //   backgroundColor: AppColor.primaryClr2,
+            //   radius: 30,
+            //   child: Text('10', style: headingStyle),
+            // ),
           ),
         ),
         Padding(
@@ -131,7 +191,8 @@ class HomeView extends GetView<QuizController> {
                 size: 15.sp,
               ),
               Text("Score : ", style: subtitleStyle.copyWith(fontSize: 12.sp)),
-              Text("5", style: subtitleStyle.copyWith(fontSize: 15.sp))
+              Text("${controller.scoreResult.round()}",
+                  style: subtitleStyle.copyWith(fontSize: 15.sp))
             ],
           ),
         )
@@ -147,7 +208,7 @@ class HomeView extends GetView<QuizController> {
           color: AppColor.primaryClr2, borderRadius: BorderRadius.circular(30)),
       child: Center(
         child: Text(
-          'Round 1',
+          'Round ${controller.numberOfQuestion.round()}',
           style: TextStyle(color: Colors.white, fontSize: 15.sp),
         ),
       ),
@@ -171,12 +232,12 @@ class HomeView extends GetView<QuizController> {
 
   buildSkipButton() {
     return InkWell(
-      onTap: () async {},
+      onTap: () => controller.nextQuestion(),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
-            'Skip',
+            'Next',
             style: subtitleStyle,
           ),
           Icon(

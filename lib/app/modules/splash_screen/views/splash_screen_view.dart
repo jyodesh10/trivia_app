@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:trivia_app/app/modules/home/controllers/home_controller.dart';
 import 'package:trivia_app/app/routes/app_pages.dart';
 import 'package:trivia_app/constants/colors.dart';
 import 'package:trivia_app/theme.dart';
@@ -12,10 +13,16 @@ class SplashScreenView extends GetView<SplashScreenController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.primaryClr,
-      body: Center(
-        child: Text(
-          'LET\'S  GET  STARTED',
-          style: headingStyle,
+      body: InkWell(
+        onTap: () {
+          HomeController().startTimer();
+          Get.toNamed(Routes.HOME);
+        },
+        child: Center(
+          child: Text(
+            'TAP TO GET STARTED',
+            style: headingStyle,
+          ),
         ),
       ),
     );

@@ -11,6 +11,7 @@ abstract class Routes {
   static const OPTIONS = _Paths.OPTIONS;
   static const ERRORS = _Paths.ERRORS;
   static const TRIVIA_FINISHED = _Paths.TRIVIA_FINISHED;
+  static const RESULTS = _Paths.RESULTS;
 }
 
 abstract class _Paths {
@@ -22,4 +23,5 @@ abstract class _Paths {
   static const OPTIONS = '/options';
   static const ERRORS = '/errors';
   static const TRIVIA_FINISHED = '/trivia-finished';
+  static const RESULTS = '/results';
 }

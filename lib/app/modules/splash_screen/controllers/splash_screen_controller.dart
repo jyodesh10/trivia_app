@@ -1,6 +1,4 @@
 import 'package:get/get.dart';
-import 'package:trivia_app/app/models/category.dart';
-import 'package:trivia_app/app/modules/category_page/views/category_page_view.dart';
 import 'package:trivia_app/app/modules/home/views/home_view.dart';
 
 class SplashScreenController extends GetxController {

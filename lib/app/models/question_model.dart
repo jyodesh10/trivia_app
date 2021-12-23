@@ -8,6 +8,13 @@ class QuestionModel {
       required this.question,
       required this.answer,
       required this.options});
+
+  factory QuestionModel.fromJson(Map<String, dynamic> json) {
+    return QuestionModel(
+      id: json['id'] as int,
+      question: json['question'] as String,
+      answer: json['answer'] as int,
+      options: json['options'],
+    );
+  }
 }
-
-
